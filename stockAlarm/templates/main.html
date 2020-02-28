@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"><script>
+    <script>
+        {% block jquery %}
+            var endpoint = 'data.html'
+            $.ajax({
+                method: "GET",
+                url: endpoint,
+                success: function(data){
+                    console.log(data)
+                },
+                error: function(error_data){
+                    console.log(error_data)
+                }
+            })
+        {% endblock %}
+    </script>
+    <title>Stock Alarmer</title>
+  </head>
+  <body>
+    <div class="container-xl">
+        <div class="container mt-3 p-0">
+            <button type="button" class="btn m-0 btn-primary">Create Account</button>
+            <button type="button" class="btn m-0 btn-primary">Login</button>
+        </div>
+        <div class="container p-3 mt-3 bg-dark text-white">
+            <h5>Stock Alarmer</h5>
+        </div>
+        <div class="container p-3 bg-primary text-white">
+        </div>
+        <div class="container my-3">
+            <h5>Stock Alarmer</h5>
+            <br>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#market">Market</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#sectors">Sectors</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#watchlist">Watchlist</a>
+                </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="market" class="container tab-pane active"><br>
+                  <h3>Market</h3>
+                  <p>Market Information will go here</p>
+                </div>
+                <div id="sectors" class="container tab-pane fade"><br>
+                  <h3>Sectors</h3>
+                  <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+                <div id="watchlist" class="container tab-pane fade"><br>
+                  <h3>Menu 2</h3>
+                  <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
