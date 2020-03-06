@@ -12,7 +12,7 @@ def home(request):
 
 def get_data(request):
     # For a test purpose, I'm hard coding in the stored JSON file path.
-    with open('/Users/hlim1/CSC536/Stock-Alarm/market_info_example.json') as f:
+    with open('../market_info_example.json') as f:
         data = json.load(f)
         return JsonResponse(data)
 
@@ -22,6 +22,6 @@ class ChartData(APIView):
 
     def get(self, request, format=None):
         # For a test purpose, I'm hard coding in the stored JSON file path.
-        with open('/Users/hlim1/CSC536/Stock-Alarm/market_info_example.json') as f:
+        with open('../market_info_example.json') as f:
             data = json.load(f)
             return JsonResponse(data)
