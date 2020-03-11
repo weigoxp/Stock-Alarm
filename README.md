@@ -11,5 +11,8 @@ django-crispy-forms
 ===================== I am a line =====================
 
 03/11
+
 Added Model User, Watchlist, and Stock
+
 Added default User (id=1), having a Watchlist (id=1) with 3 Stock (id=1..3)
+
