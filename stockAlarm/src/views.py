@@ -4,15 +4,18 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 
 import json
 
 
 # Create your views here.
+from src.forms import saveStockPriceChangeForm
+
+
 def home(request):
-    return render(request, 'main.html')
+    return save_stock_price_change(request)
+    # return render(request, 'main.html')
 
 
 def get_data(request):
@@ -33,16 +36,16 @@ class ChartData(APIView):
             return JsonResponse(data)
 
 
-def signup(request):
+def save_stock_price_change(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = saveStockPriceChangeForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('home')
+            increase_to = form.cleaned_data['increase_to']
+            decrease_to = form.cleaned_data['decrease_to']
+            increase_by = form.cleaned_data['increase_by']
+            decrease_by = form.cleaned_data['decrease_by']
+        return render(request, 'main.html', {'form': saveStockPriceChangeForm()})
+    # I don't know why the request is never GET...
     else:
-        form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+        form = saveStockPriceChangeForm()
+        return render(request, 'main.html', {'form': form})

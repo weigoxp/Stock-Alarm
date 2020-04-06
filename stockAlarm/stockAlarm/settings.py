@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # own app
-    'src'
+    'users.apps.UsersConfig',
+    'src',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +128,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_REDIRECT_URL = 'homePage'
+
+# if some page requires the user logging in, the user will be redirected to the log in page.
+LOGIN_URL = 'login'
