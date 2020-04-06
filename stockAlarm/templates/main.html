@@ -1,557 +1,557 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    <script src="https://github.com/Nickersoft/push.js/tree/master/bin/push.js"></script>
-    <style>
-        .overlay {
-          height: 0%;
-          width: 50%;
-          position: fixed;
-          z-index: 1;
-          top: 0;
-          right: 0;
-          background-color: rgb(0,0,0);
-          background-color: rgba(0,0,0, 0.9);
-          overflow-y: hidden;
-          transition: 0.5s;
-        }
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+        <script src="https://github.com/Nickersoft/push.js/tree/master/bin/push.js"></script>
+        <style>
+            .overlay {
+                height: 0%;
+                width: 50%;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                right: 0;
+                background-color: rgb(0,0,0);
+                background-color: rgba(0,0,0, 0.9);
+                overflow-y: hidden;
+                transition: 0.5s;
+            }
 
-        .overlay-content {
-          position: relative;
-          top: 25%;
-          width: 100%;
-          text-align: center;
-          margin-top: 30px;
-        }
+            .overlay-content {
+                position: relative;
+                top: 25%;
+                width: 100%;
+                text-align: center;
+                margin-top: 30px;
+            }
 
-        .overlay a {
-          padding: 8px;
-          text-decoration: none;
-          font-size: 36px;
-          color: #818181;
-          display: block;
-          transition: 0.3s;
-        }
+            .overlay a {
+                padding: 8px;
+                text-decoration: none;
+                font-size: 36px;
+                color: #818181;
+                display: block;
+                transition: 0.3s;
+            }
 
-        .overlay a:hover, .overlay a:focus {
-          color: #f1f1f1;
-        }
+            .overlay a:hover, .overlay a:focus {
+                color: #f1f1f1;
+            }
 
-        .overlay .closebtn {
-          position: absolute;
-          top: 20px;
-          right: 45px;
-          font-size: 60px;
-        }
+            .overlay .closebtn {
+                position: absolute;
+                top: 20px;
+                right: 45px;
+                font-size: 60px;
+            }
 
-        @media screen and (max-height: 450px) {
-          .overlay {overflow-y: auto;}
-          .overlay a {font-size: 20px}
-          .overlay .closebtn {
-          font-size: 40px;
-          top: 15px;
-          right: 35px;
-          }
-        }
-    </style>
-    <title>Stock Alarmer</title>
-  </head>
-  <body>
-    <div class="container-xl">
-        <div class="col-md-8">
-            {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+            @media screen and (max-height: 450px) {
+                .overlay {overflow-y: auto;}
+                .overlay a {font-size: 20px}
+                .overlay .closebtn {
+                    font-size: 40px;
+                    top: 15px;
+                    right: 35px;
+                }
+            }
+            </style>
+            <title>Stock Alarmer</title>
+    </head>
+    <body>
+        <div class="container-xl">
+            <div class="col-md-8">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
                 {% endif %}
-            {% block content %}{% endblock %}
-        </div>
-        <div class="container mt-3 p-0">
-            {% if user.is_authenticated %}
+                {% block content %}{% endblock %}
+            </div>
+            <div class="container mt-3 p-0">
+                {% if user.is_authenticated %}
                 <a href="{% url 'profile' %}">Profile</a>
                 <a href="{% url 'logout' %}">Logout</a>
-            {% else %}
+                {% else %}
                 <a href="{% url 'login' %}">Login</a>
                 <a href="{% url 'register' %}">Register</a>
-            {% endif %}
-        </div>
-        <div class="container p-3 mt-3 bg-dark text-white">
-            <h5>Stock Alarmer</h5>
-        </div>
-        <div class="container p-3 bg-primary text-white">
-          <h5>Market Summary</h5>
-          <div class="table-responsive">
-              <table class="table text-white">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th id="snp-name"></th>
-                    <th id="dow-name"></th>
-                    <th id="nasdaq-name"></th>
-                    <th id="russell-name"></th>
-                    <th id="ftse-name"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Market Price</td>
-                    <td id="snp"></td>
-                    <td id="dji"></td>
-                    <td id="nasdaq"></td>
-                    <td id="russell"></td>
-                    <td id="ftse"></td>
-                  </tr>
-                  <tr>
-                    <td>Market Change (%)</td>
-                    <td id="snpChg"></td>
-                    <td id="djiChg"></td>
-                    <td id="nasdaqChg"></td>
-                    <td id="russellChg"></td>
-                    <td id="ftseChg"></td>
-                  </tr>
-                  <tr>
-                    <td>Market State</td>
-                    <td id="snpSt"></td>
-                    <td id="djiSt"></td>
-                    <td id="nasdaqSt"></td>
-                    <td id="russellSt"></td>
-                    <td id="ftseSt"></td>
-                  </tr>
-                </tbody>
-              </table>
-          </div>
-        </div>
-        <div class="container my-3">
-            <h5>Stock Alarmer</h5>
-            <br>
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs nav-justified" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#market">Market</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#sectors">Top Movers</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#watchlist">Watchlist</a>
-                </li>
-            </ul>
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div id="market" class="container tab-pane active"><br>
-                  <h3>Market</h3>
-                  <div class="table-responsive">
-                      <table class="table text-white">
-                        <tbody>
-                          <tr class="row">
-                              <td class='col-sm-3'>
-                                  <canvas id="snp-chart" width="400" height="400"></canvas>
-                              </td>
-                              <td class='col-sm-3'>
-                                  <canvas id="dji-chart" width="400" height="400"></canvas>
-                              </td>
-                              <td class='col-sm-3'>
-                                  <canvas id="nasdaq-chart" width="400" height="400"></canvas>
-                              </td>
-                              <td class='col-sm-3'>
-                                  <canvas id="russell-chart" width="400" height="400"></canvas>
-                              </td>
-                              <td class='col-sm-3'>
-                                  <canvas id="ftse-chart" width="400" height="400"></canvas>
-                              </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                  </div>
-                </div>
-                <div id="sectors" class="container tab-pane fade"><br>
-                  <h3>Top Movers</h3>
-                  <div class="table-responsive">
-                      <table class="table">
+                {% endif %}
+            </div>
+            <div class="container p-3 mt-3 bg-dark text-white">
+                <h5>Stock Alarmer</h5>
+            </div>
+            <div class="container p-3 bg-primary text-white">
+                <h5>Market Summary</h5>
+                <div class="table-responsive">
+                    <table class="table text-white">
                         <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>Day Top Gainers</th>
-                            <th>Day Top Losers</th>
-                            <th>Day Most Active</th>
-                          </tr>
+                            <tr>
+                                <th>#</th>
+                                <th id="snp-name"></th>
+                                <th id="dow-name"></th>
+                                <th id="nasdaq-name"></th>
+                                <th id="russell-name"></th>
+                                <th id="ftse-name"></th>
+                            </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>Symbol/Market</td>
-                            <td id="ga1"></td>
-                            <td id="lo1"></td>
-                            <td id="ma1"></td>
-                          </tr>
-                          <tr>
-                            <td>Symbol/Market</td>
-                            <td id="ga2"></td>
-                            <td id="lo2"></td>
-                            <td id="ma2"></td>
-                          </tr>
-                          <tr>
-                            <td>Symbol/Market</td>
-                            <td id="ga3"></td>
-                            <td id="lo3"></td>
-                            <td id="ma3"></td>
-                          </tr>
-                          <tr>
-                            <td>Symbol/Market</td>
-                            <td id="ga4"></td>
-                            <td id="lo4"></td>
-                            <td id="ma4"></td>
-                          </tr>
-                          <tr>
-                            <td>Symbol/Market</td>
-                            <td id="ga5"></td>
-                            <td id="lo5"></td>
-                            <td id="ma5"></td>
-                          </tr>
+                            <tr>
+                                <td>Market Price</td>
+                                <td id="snp"></td>
+                                <td id="dji"></td>
+                                <td id="nasdaq"></td>
+                                <td id="russell"></td>
+                                <td id="ftse"></td>
+                            </tr>
+                            <tr>
+                                <td>Market Change (%)</td>
+                                <td id="snpChg"></td>
+                                <td id="djiChg"></td>
+                                <td id="nasdaqChg"></td>
+                                <td id="russellChg"></td>
+                                <td id="ftseChg"></td>
+                            </tr>
+                            <tr>
+                                <td>Market State</td>
+                                <td id="snpSt"></td>
+                                <td id="djiSt"></td>
+                                <td id="nasdaqSt"></td>
+                                <td id="russellSt"></td>
+                                <td id="ftseSt"></td>
+                            </tr>
                         </tbody>
-                      </table>
-                  </div>
+                    </table>
                 </div>
-                <div id="watchlist" class="container tab-pane fade"><br>
-                  <h3>Watchlist</h3>
-                    {% if user.is_authenticated %}
-                     <div id="myNav" class="overlay">
-                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-                        <div class="overlay-content text-white">
-                          <h1>Notification Settings</h1>
-                            <form method="post">{% csrf_token %}
-                                {{ form.as_p }}
-                              <button type="submit" class="btn btn-info my-3">Save</button>
-                            </form>
-                          <p class="my-3">$ or % signs are not needed.</p>
-                          <p>Please enter a valid numbers.</p>
+            </div>
+            <div class="container my-3">
+                <h5>Stock Alarmer</h5>
+                <br>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs nav-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#market">Market</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#sectors">Top Movers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#watchlist">Watchlist</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div id="market" class="container tab-pane active"><br>
+                        <h3>Market</h3>
+                        <div class="table-responsive">
+                            <table class="table text-white">
+                                <tbody>
+                                    <tr class="row">
+                                        <td class='col-sm-3'>
+                                            <canvas id="snp-chart" width="400" height="400"></canvas>
+                                        </td>
+                                        <td class='col-sm-3'>
+                                            <canvas id="dji-chart" width="400" height="400"></canvas>
+                                        </td>
+                                        <td class='col-sm-3'>
+                                            <canvas id="nasdaq-chart" width="400" height="400"></canvas>
+                                        </td>
+                                        <td class='col-sm-3'>
+                                            <canvas id="russell-chart" width="400" height="400"></canvas>
+                                        </td>
+                                        <td class='col-sm-3'>
+                                            <canvas id="ftse-chart" width="400" height="400"></canvas>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                     </div>
-                     <div class="input-group">
-                        <input id="usr-input" type="text" placeholder="Search (i.e. AMZN)" name="search">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary" onclick="searchSymbol()">Search</button>
+                    </div>
+                    <div id="sectors" class="container tab-pane fade"><br>
+                        <h3>Top Movers</h3>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Day Top Gainers</th>
+                                        <th>Day Top Losers</th>
+                                        <th>Day Most Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Symbol/Market</td>
+                                        <td id="ga1"></td>
+                                        <td id="lo1"></td>
+                                        <td id="ma1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Symbol/Market</td>
+                                        <td id="ga2"></td>
+                                        <td id="lo2"></td>
+                                        <td id="ma2"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Symbol/Market</td>
+                                        <td id="ga3"></td>
+                                        <td id="lo3"></td>
+                                        <td id="ma3"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Symbol/Market</td>
+                                        <td id="ga4"></td>
+                                        <td id="lo4"></td>
+                                        <td id="ma4"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Symbol/Market</td>
+                                        <td id="ga5"></td>
+                                        <td id="lo5"></td>
+                                        <td id="ma5"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                     </div>
-                     <div class="container my-3">
-                        <table class="table">
-                          <tr id="srch-result-td">
-                            <td id="symb"></td>
-                            <td id="prc"></td>
-                            <td id="mkt"></td>
-                            <td id="prc-chg"></td>
-                            <td id="52-weeks-range"></td>
-                            <td id="add-btn">
-                            </td>
-                          </tr>
-                        </table>
-                     </div>
-                     </div>
+                    </div>
+                    <div id="watchlist" class="container tab-pane fade"><br>
+                        <h3>Watchlist</h3>
+                        {% if user.is_authenticated %}
+                        <div id="myNav" class="overlay">
+                            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                            <div class="overlay-content text-white">
+                                <h1>Notification Settings</h1>
+                                <form method="post">{% csrf_token %}
+                                    {{ form.as_p }}
+                                    <button type="submit" class="btn btn-info my-3">Save</button>
+                                </form>
+                                <p class="my-3">$ or % signs are not needed.</p>
+                                <p>Please enter a valid numbers.</p>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input id="usr-input" type="text" placeholder="Search (i.e. AMZN)" name="search">
+                            <div class="input-group-btn">
+                                <button class="btn btn-primary" onclick="searchSymbol()">Search</button>
+                            </div>
+                        </div>
+                        <div class="container my-3">
+                            <table class="table">
+                                <tr id="srch-result-td">
+                                    <td id="symb"></td>
+                                    <td id="prc"></td>
+                                    <td id="mkt"></td>
+                                    <td id="prc-chg"></td>
+                                    <td id="52-weeks-range"></td>
+                                    <td id="add-btn">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                     {% else %}
-                     <div class="border-top pt-3">
+                    <div class="border-top pt-3">
                         <div class="container mt-3 p-0">
                             You have to<a class="ml-2" href="{% url 'login' %}">Log In</a> to see your watchlist.
                         </div>
                         <div class="container mt-3 p-0">
                             Need An Account?<a class="ml-2" href="{% url 'register' %}">Sign Up</a> Now.
                         </div>
-                     </div>
+                    </div>
                     {% endif %}
-                     <div class="table-responsive">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th></th>
-                            <th>Symbol</th>
-                            <th>Price</th>
-                            <th>Market</th>
-                            <th>52 weeks range</th>
-                            <th>Market Change ($/%)</th>
-                            <th>Notification Setting</th>
-                          </tr>
-                        </thead>
-                        <tbody id="watchlist-body">
-                        </tbody>
-                      </table>
-                     </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Symbol</th>
+                                    <th>Price</th>
+                                    <th>Market</th>
+                                    <th>52 weeks range</th>
+                                    <th>Market Change ($/%)</th>
+                                    <th>Notification Setting</th>
+                                </tr>
+                            </thead>
+                            <tbody id="watchlist-body">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-    </div>
-    <script>
-        {% block jquery %}
-            var today = new Date();
-            var dates = new Array();
-            var j = 0;
-            for (var i = 5; i >= 0; i--) {
-                dates[j] = (today.getMonth()+1)+"/"+(today.getDate() - i)
-                j++;
-            }
-            var settings = {
-                "async": true,
-                "crossDomain": true,
-                "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-summary?region=US&lang=en",
-                "method": "GET",
-                "headers": {
-                    "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-                    "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+        </div>
+        <script>
+            {% block jquery %}
+                var today = new Date();
+                var dates = new Array();
+                var j = 0;
+                for (var i = 5; i >= 0; i--) {
+                    dates[j] = (today.getMonth()+1)+"/"+(today.getDate() - i)
+                    j++;
                 }
-            }
 
-            $.ajax(settings).done(function (response) {
-                var snp = response['marketSummaryResponse']['result'][0]
-                document.getElementById('snp-name').innerHTML = snp['shortName']
-                document.getElementById('snp').innerHTML = snp['regularMarketPrice']['fmt']
-                document.getElementById('snpChg').innerHTML = snp['regularMarketChangePercent']['fmt']
-                document.getElementById('snpSt').innerHTML = snp['marketState']
-
-                var dji = response['marketSummaryResponse']['result'][1]
-                document.getElementById('dow-name').innerHTML = dji['shortName']
-                document.getElementById('dji').innerHTML = dji['regularMarketPrice']['fmt']
-                document.getElementById('djiChg').innerHTML = dji['regularMarketChangePercent']['fmt']
-                document.getElementById('djiSt').innerHTML = dji['marketState']
-
-                var nasdaq = response['marketSummaryResponse']['result'][2]
-                document.getElementById('nasdaq-name').innerHTML = nasdaq['shortName']
-                document.getElementById('nasdaq').innerHTML = nasdaq['regularMarketPrice']['fmt']
-                document.getElementById('nasdaqChg').innerHTML = nasdaq['regularMarketChangePercent']['fmt']
-                document.getElementById('nasdaqSt').innerHTML = nasdaq['marketState']
-
-                var russell = response['marketSummaryResponse']['result'][3]
-                document.getElementById('russell-name').innerHTML = russell['shortName']
-                document.getElementById('russell').innerHTML = russell['regularMarketPrice']['fmt']
-                document.getElementById('russellChg').innerHTML = russell['regularMarketChangePercent']['fmt']
-                document.getElementById('russellSt').innerHTML = russell['marketState']
-
-                var ftse = response['marketSummaryResponse']['result'][14]
-                document.getElementById('ftse-name').innerHTML = ftse['shortName']
-                document.getElementById('ftse').innerHTML = ftse['regularMarketPrice']['fmt']
-                document.getElementById('ftseChg').innerHTML = ftse['regularMarketChangePercent']['fmt']
-                document.getElementById('ftseSt').innerHTML = ftse['marketState']
-
-                var snpctx = document.getElementById('snp-chart').getContext('2d');
-                var snpChart = new Chart(snpctx, {
-                    type: 'line',
-                    data: {
-                        labels: ["previous", "regular"],
-                        datasets: [{
-                            label: snp['shortName'],
-                            data: [
-                                snp['regularMarketPreviousClose']['raw'],
-                                snp['regularMarketPrice']['raw']
-                            ],
-                        }]
+                var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-summary?region=US&lang=en",
+                    "method": "GET",
+                    "headers": {
+                        "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+                        "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
                     }
-                });
-                var djictx = document.getElementById('dji-chart').getContext('2d');
-                var djiChart = new Chart(djictx, {
-                    type: 'line',
-                    data: {
-                        labels: ["previous", "regular"],
-                        datasets: [{
-                            label: dji['shortName'],
-                            data: [
-                                dji['regularMarketPreviousClose']['raw'],
-                                dji['regularMarketPrice']['raw']
-                            ],
-                        }]
-                    }
-                });
-                var nasctx = document.getElementById('nasdaq-chart').getContext('2d');
-                var nasChart = new Chart(nasctx, {
-                    type: 'line',
-                    data: {
-                        labels: ["previous", "regular"],
-                        datasets: [{
-                            label: nasdaq['shortName'],
-                            data: [
-                                nasdaq['regularMarketPreviousClose']['raw'],
-                                nasdaq['regularMarketPrice']['raw']
-                            ],
-                        }]
-                    }
-                });
-                var rusctx = document.getElementById('russell-chart').getContext('2d');
-                var rusChart = new Chart(rusctx, {
-                    type: 'line',
-                    data: {
-                        labels: ["previous", "regular"],
-                        datasets: [{
-                            label: russell['shortName'],
-                            data: [
-                                russell['regularMarketPreviousClose']['raw'],
-                                russell['regularMarketPrice']['raw']
-                            ],
-                        }]
-                    }
-                });
-                var ftsctx = document.getElementById('ftse-chart').getContext('2d');
-                var ftsChart = new Chart(ftsctx, {
-                    type: 'line',
-                    data: {
-                        labels: ["previous", "regular"],
-                        datasets: [{
-                            label: ftse['shortName'],
-                            data: [
-                                ftse['regularMarketPreviousClose']['raw'],
-                                ftse['regularMarketPrice']['raw']
-                            ],
-                        }]
-                    }
-                });
-            });
-
-            var movers = {
-                "async": true,
-                "crossDomain": true,
-                "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-movers?region=US&lang=en",
-                "method": "GET",
-                "headers": {
-                    "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-                    "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
                 }
-            }
 
-            $.ajax(movers).done(function (response) {
-                var result = response['finance']['result']
-                
-                var ga1 = result[0]
-                document.getElementById('ga1').innerHTML = 
-                    ga1['quotes'][0]['symbol'] + " / " + ga1['quotes'][0]['fullExchangeName']
-                var ga2 = result[0]
-                document.getElementById('ga2').innerHTML = 
-                    ga2['quotes'][1]['symbol'] + " / " + ga2['quotes'][0]['fullExchangeName']
-                var ga3 = result[0]
-                document.getElementById('ga3').innerHTML = 
-                    ga3['quotes'][3]['symbol'] + " / " + ga3['quotes'][0]['fullExchangeName']
-                var ga4 = result[0]
-                document.getElementById('ga4').innerHTML = 
-                    ga4['quotes'][4]['symbol'] + " / " + ga4['quotes'][0]['fullExchangeName']
-                var ga5 = result[0]
-                document.getElementById('ga5').innerHTML = 
-                    ga5['quotes'][5]['symbol'] + " / " + ga5['quotes'][0]['fullExchangeName']
-            
-                var lo1 = result[1]
-                document.getElementById('lo1').innerHTML = 
-                    lo1['quotes'][0]['symbol'] + " / " + lo1['quotes'][0]['fullExchangeName']
-                var lo2 = result[1]
-                document.getElementById('lo2').innerHTML = 
-                    lo2['quotes'][1]['symbol'] + " / " + lo2['quotes'][0]['fullExchangeName']
-                var lo3 = result[1]
-                document.getElementById('lo3').innerHTML = 
-                    lo3['quotes'][3]['symbol'] + " / " + lo3['quotes'][0]['fullExchangeName']
-                var lo4 = result[1]
-                document.getElementById('lo4').innerHTML = 
-                    lo4['quotes'][4]['symbol'] + " / " + lo4['quotes'][0]['fullExchangeName']
-                var lo5 = result[1]
-                document.getElementById('lo5').innerHTML = 
-                    lo5['quotes'][5]['symbol'] + " / " + lo5['quotes'][0]['fullExchangeName']
-            
-                var ma1 = result[2]
-                document.getElementById('ma1').innerHTML = 
-                    ma1['quotes'][0]['symbol'] + " / " + ma1['quotes'][0]['fullExchangeName']
-                var ma2 = result[2]
-                document.getElementById('ma2').innerHTML =
-                    ma2['quotes'][1]['symbol'] + " / " + ma2['quotes'][0]['fullExchangeName']
-                var ma3 = result[2]
-                document.getElementById('ma3').innerHTML = 
-                    ma3['quotes'][3]['symbol'] + " / " + ma3['quotes'][0]['fullExchangeName']
-                var ma4 = result[2]
-                document.getElementById('ma4').innerHTML = 
-                    ma4['quotes'][4]['symbol'] + " / " + ma4['quotes'][0]['fullExchangeName']
-                var ma5 = result[2]
-                document.getElementById('ma5').innerHTML = 
-                    ma5['quotes'][5]['symbol'] + " / " + ma5['quotes'][0]['fullExchangeName']
-            });
-        function searchSymbol() {
-            var symbol = document.getElementById('usr-input')
+                $.ajax(settings).done(function (response) {
+                    var snp = response['marketSummaryResponse']['result'][0]
+                    document.getElementById('snp-name').innerHTML = snp['shortName']
+                    document.getElementById('snp').innerHTML = snp['regularMarketPrice']['fmt']
+                    document.getElementById('snpChg').innerHTML = snp['regularMarketChangePercent']['fmt']
+                    document.getElementById('snpSt').innerHTML = snp['marketState']
 
-            var settings = {
-                "async": true,
-                "crossDomain": true,
-                "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-quotes?region=US&lang=en&symbols=",
-                "method": "GET",
-                "headers": {
-                    "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-                    "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+                    var dji = response['marketSummaryResponse']['result'][1]
+                    document.getElementById('dow-name').innerHTML = dji['shortName']
+                    document.getElementById('dji').innerHTML = dji['regularMarketPrice']['fmt']
+                    document.getElementById('djiChg').innerHTML = dji['regularMarketChangePercent']['fmt']
+                    document.getElementById('djiSt').innerHTML = dji['marketState']
+
+                    var nasdaq = response['marketSummaryResponse']['result'][2]
+                    document.getElementById('nasdaq-name').innerHTML = nasdaq['shortName']
+                    document.getElementById('nasdaq').innerHTML = nasdaq['regularMarketPrice']['fmt']
+                    document.getElementById('nasdaqChg').innerHTML = nasdaq['regularMarketChangePercent']['fmt']
+                    document.getElementById('nasdaqSt').innerHTML = nasdaq['marketState']
+
+                    var russell = response['marketSummaryResponse']['result'][3]
+                    document.getElementById('russell-name').innerHTML = russell['shortName']
+                    document.getElementById('russell').innerHTML = russell['regularMarketPrice']['fmt']
+                    document.getElementById('russellChg').innerHTML = russell['regularMarketChangePercent']['fmt']
+                    document.getElementById('russellSt').innerHTML = russell['marketState']
+
+                    var ftse = response['marketSummaryResponse']['result'][14]
+                    document.getElementById('ftse-name').innerHTML = ftse['shortName']
+                    document.getElementById('ftse').innerHTML = ftse['regularMarketPrice']['fmt']
+                    document.getElementById('ftseChg').innerHTML = ftse['regularMarketChangePercent']['fmt']
+                    document.getElementById('ftseSt').innerHTML = ftse['marketState']
+
+                    var snpctx = document.getElementById('snp-chart').getContext('2d');
+                    var snpChart = new Chart(snpctx, {
+                        type: 'line',
+                        data: {
+                            labels: ["previous", "regular"],
+                            datasets: [{
+                                label: snp['shortName'],
+                                data: [
+                                    snp['regularMarketPreviousClose']['raw'],
+                                    snp['regularMarketPrice']['raw']
+                                ],
+                            }]
+                        }
+                    });
+                    var djictx = document.getElementById('dji-chart').getContext('2d');
+                    var djiChart = new Chart(djictx, {
+                        type: 'line',
+                        data: {
+                            labels: ["previous", "regular"],
+                            datasets: [{
+                                label: dji['shortName'],
+                                data: [
+                                    dji['regularMarketPreviousClose']['raw'],
+                                    dji['regularMarketPrice']['raw']
+                                ],
+                            }]
+                        }
+                    });
+                    var nasctx = document.getElementById('nasdaq-chart').getContext('2d');
+                    var nasChart = new Chart(nasctx, {
+                        type: 'line',
+                        data: {
+                            labels: ["previous", "regular"],
+                            datasets: [{
+                                label: nasdaq['shortName'],
+                                data: [
+                                    nasdaq['regularMarketPreviousClose']['raw'],
+                                    nasdaq['regularMarketPrice']['raw']
+                                ],
+                            }]
+                        }
+                    });
+                    var rusctx = document.getElementById('russell-chart').getContext('2d');
+                    var rusChart = new Chart(rusctx, {
+                        type: 'line',
+                        data: {
+                            labels: ["previous", "regular"],
+                            datasets: [{
+                                label: russell['shortName'],
+                                data: [
+                                    russell['regularMarketPreviousClose']['raw'],
+                                    russell['regularMarketPrice']['raw']
+                                ],
+                            }]
+                        }
+                    });
+                    var ftsctx = document.getElementById('ftse-chart').getContext('2d');
+                    var ftsChart = new Chart(ftsctx, {
+                        type: 'line',
+                        data: {
+                            labels: ["previous", "regular"],
+                            datasets: [{
+                                label: ftse['shortName'],
+                                data: [
+                                    ftse['regularMarketPreviousClose']['raw'],
+                                    ftse['regularMarketPrice']['raw']
+                                ],
+                            }]
+                        }
+                    });
+                });
+
+                var movers = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-movers?region=US&lang=en",
+                    "method": "GET",
+                    "headers": {
+                        "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+                        "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+                    }
                 }
-            }
-            settings["url"] = settings["url"] + symbol.value
 
-            $.ajax(settings).done(function (response) {
-                var result = response['quoteResponse']['result'][0]
-                document.getElementById('symb').innerHTML = result['symbol']
-                document.getElementById('prc').innerHTML = result['regularMarketPrice']
-                document.getElementById('mkt').innerHTML = result['exchange']
-                var priceChgUSD = result['regularMarketChange']
-                var priceChgPer = result['regularMarketChangePercent']
-                document.getElementById('prc-chg').innerHTML = 
-                    (priceChgUSD.toFixed(2)).toString() + "/" + (priceChgPer.toFixed(2)).toString() + "%"
-                document.getElementById('52-weeks-range').innerHTML = result['fiftyTwoWeekRange']
-                var element = document.createElement("input");
-                element.setAttribute("type", "button");
-                element.setAttribute("class", "btn btn-info");
-                element.setAttribute("value", "Add");
-                element.setAttribute("onclick", "addToWatchlist();");
-                var btn = document.getElementById('add-btn');
-                btn.replaceChild(element, btn.childNodes[0]);
-            });
-        }
-        function addToWatchlist() {
-            var watchlistBody = document.getElementById("watchlist-body");
-            var row = watchlistBody.insertRow(-1);
-            var removeOptionCell = row.insertCell(0);
-            var symCell = row.insertCell(1);
-            symCell.innerHTML = document.getElementById('symb').innerHTML;
-            row.setAttribute("id", symCell.innerHTML);
-            var prcCell = row.insertCell(2);
-            prcCell.innerHTML = document.getElementById('prc').innerHTML; 
-            var mktCell = row.insertCell(3);
-            mktCell.innerHTML = document.getElementById('mkt').innerHTML; 
-            var rangeCell = row.insertCell(4);
-            rangeCell.innerHTML = document.getElementById('52-weeks-range').innerHTML; 
-            var mktChgCell = row.insertCell(5);
-            mktChgCell.innerHTML = document.getElementById('prc-chg').innerHTML; 
-            var openNavBtnCell = row.insertCell(6);
-            // Open notification settings.
-            var element1 = document.createElement("input");
-            element1.setAttribute("type", "button");
-            element1.setAttribute("class", "btn btn-info");
-            element1.setAttribute("value", "Add");
-            element1.setAttribute("onclick", "openNav()");
-            openNavBtnCell.appendChild(element1);
-            // Remove target from the watchlist.
-            var element2 = document.createElement("input");
-            element2.setAttribute("type", "button");
-            element2.setAttribute("class", "btn btn-danger");
-            element2.setAttribute("value", "Remove");
-            element2.setAttribute("onclick", "remove('"+symCell.innerHTML+"');");
-            removeOptionCell.appendChild(element2);
-        }
+                $.ajax(movers).done(function (response) {
+                    var result = response['finance']['result']
 
-        function remove(target) {
-            var rmvTarget = document.getElementById(target);
-            rmvTarget.remove();
-        }
+                    var ga1 = result[0]
+                    document.getElementById('ga1').innerHTML = 
+                        ga1['quotes'][0]['symbol'] + " / " + ga1['quotes'][0]['fullExchangeName']
+                    var ga2 = result[0]
+                    document.getElementById('ga2').innerHTML = 
+                        ga2['quotes'][1]['symbol'] + " / " + ga2['quotes'][0]['fullExchangeName']
+                    var ga3 = result[0]
+                    document.getElementById('ga3').innerHTML = 
+                        ga3['quotes'][3]['symbol'] + " / " + ga3['quotes'][0]['fullExchangeName']
+                    var ga4 = result[0]
+                    document.getElementById('ga4').innerHTML = 
+                        ga4['quotes'][4]['symbol'] + " / " + ga4['quotes'][0]['fullExchangeName']
+                    var ga5 = result[0]
+                    document.getElementById('ga5').innerHTML = 
+                        ga5['quotes'][5]['symbol'] + " / " + ga5['quotes'][0]['fullExchangeName']
 
-        function openNav() {
-          document.getElementById("myNav").style.height = "100%";
-        }
+                    var lo1 = result[1]
+                    document.getElementById('lo1').innerHTML = 
+                        lo1['quotes'][0]['symbol'] + " / " + lo1['quotes'][0]['fullExchangeName']
+                    var lo2 = result[1]
+                    document.getElementById('lo2').innerHTML = 
+                        lo2['quotes'][1]['symbol'] + " / " + lo2['quotes'][0]['fullExchangeName']
+                    var lo3 = result[1]
+                    document.getElementById('lo3').innerHTML = 
+                        lo3['quotes'][3]['symbol'] + " / " + lo3['quotes'][0]['fullExchangeName']
+                    var lo4 = result[1]
+                    document.getElementById('lo4').innerHTML = 
+                        lo4['quotes'][4]['symbol'] + " / " + lo4['quotes'][0]['fullExchangeName']
+                    var lo5 = result[1]
+                    document.getElementById('lo5').innerHTML = 
+                        lo5['quotes'][5]['symbol'] + " / " + lo5['quotes'][0]['fullExchangeName']
 
-        function closeNav() {
-          document.getElementById("myNav").style.height = "0%";
-        }
-        $("notify-button").click(function(){
-            Push.create("Hello World!");
-        });
-        {% endblock %}
-    </script>
-  </body>
+                    var ma1 = result[2]
+                    document.getElementById('ma1').innerHTML = 
+                        ma1['quotes'][0]['symbol'] + " / " + ma1['quotes'][0]['fullExchangeName']
+                    var ma2 = result[2]
+                    document.getElementById('ma2').innerHTML =
+                        ma2['quotes'][1]['symbol'] + " / " + ma2['quotes'][0]['fullExchangeName']
+                    var ma3 = result[2]
+                    document.getElementById('ma3').innerHTML = 
+                        ma3['quotes'][3]['symbol'] + " / " + ma3['quotes'][0]['fullExchangeName']
+                    var ma4 = result[2]
+                    document.getElementById('ma4').innerHTML = 
+                        ma4['quotes'][4]['symbol'] + " / " + ma4['quotes'][0]['fullExchangeName']
+                    var ma5 = result[2]
+                    document.getElementById('ma5').innerHTML = 
+                        ma5['quotes'][5]['symbol'] + " / " + ma5['quotes'][0]['fullExchangeName']
+                });
+
+                function searchSymbol() {
+                    var symbol = document.getElementById('usr-input')
+
+                    var settings = {
+                        "async": true,
+                        "crossDomain": true,
+                        "url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-quotes?region=US&lang=en&symbols=",
+                        "method": "GET",
+                        "headers": {
+                            "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+                            "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+                        }
+                    }
+                    settings["url"] = settings["url"] + symbol.value
+
+                    $.ajax(settings).done(function (response) {
+                        var result = response['quoteResponse']['result'][0]
+                        document.getElementById('symb').innerHTML = result['symbol']
+                        document.getElementById('prc').innerHTML = result['regularMarketPrice']
+                        document.getElementById('mkt').innerHTML = result['exchange']
+                        var priceChgUSD = result['regularMarketChange']
+                        var priceChgPer = result['regularMarketChangePercent']
+                        document.getElementById('prc-chg').innerHTML = 
+                            (priceChgUSD.toFixed(2)).toString() + "/" + (priceChgPer.toFixed(2)).toString() + "%"
+                        document.getElementById('52-weeks-range').innerHTML = result['fiftyTwoWeekRange']
+                        var element = document.createElement("input");
+                        element.setAttribute("type", "button");
+                        element.setAttribute("class", "btn btn-info");
+                        element.setAttribute("value", "Add");
+                        element.setAttribute("onclick", "addToWatchlist();");
+                        var btn = document.getElementById('add-btn');
+                        btn.replaceChild(element, btn.childNodes[0]);
+                    });
+                }
+
+                function addToWatchlist() {
+                    var watchlistBody = document.getElementById("watchlist-body");
+                    var row = watchlistBody.insertRow(-1);
+                    var removeOptionCell = row.insertCell(0);
+                    var symCell = row.insertCell(1);
+                    symCell.innerHTML = document.getElementById('symb').innerHTML;
+                    row.setAttribute("id", symCell.innerHTML);
+                    var prcCell = row.insertCell(2);
+                    prcCell.innerHTML = document.getElementById('prc').innerHTML; 
+                    var mktCell = row.insertCell(3);
+                    mktCell.innerHTML = document.getElementById('mkt').innerHTML; 
+                    var rangeCell = row.insertCell(4);
+                    rangeCell.innerHTML = document.getElementById('52-weeks-range').innerHTML; 
+                    var mktChgCell = row.insertCell(5);
+                    mktChgCell.innerHTML = document.getElementById('prc-chg').innerHTML; 
+                    var openNavBtnCell = row.insertCell(6);
+                    // Open notification settings.
+                    var element1 = document.createElement("input");
+                    element1.setAttribute("type", "button");
+                    element1.setAttribute("class", "btn btn-info");
+                    element1.setAttribute("value", "Add");
+                    element1.setAttribute("onclick", "openNav()");
+                    openNavBtnCell.appendChild(element1);
+                    // Remove target from the watchlist.
+                    var element2 = document.createElement("input");
+                    element2.setAttribute("type", "button");
+                    element2.setAttribute("class", "btn btn-danger");
+                    element2.setAttribute("value", "Remove");
+                    element2.setAttribute("onclick", "remove('"+symCell.innerHTML+"');");
+                    removeOptionCell.appendChild(element2);
+                }
+
+                function remove(target) {
+                    var rmvTarget = document.getElementById(target);
+                    rmvTarget.remove();
+                }
+
+                function openNav() {
+                    document.getElementById("myNav").style.height = "100%";
+                }
+
+                function closeNav() {
+                    document.getElementById("myNav").style.height = "0%";
+                }
+            {% endblock %}
+        </script>
+    </body>
 </html>
