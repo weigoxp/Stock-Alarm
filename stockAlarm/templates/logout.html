@@ -1,8 +1,9 @@
 {% block content %}
     <h2>You have been logged out</h2>
     <div class="border-top pt-3">
-        <small class="text-muted">
-            <a href="{% url 'login' %}">Log In Again</a>
-        </small>
+        <div class="container mt-3 p-0">
+            <a href="{% url 'login' %}">Log In Again</a> <br>
+            <a href="{% url 'homePage' %}">Back To Main Page</a>
+        </div>
     </div>
 {% endblock content %}
