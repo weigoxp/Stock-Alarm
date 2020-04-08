@@ -125,7 +125,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = ''
+
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+        '/Users/hlim1/CSC536/Stock-Alarm/stockAlarm/static',
+)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
