@@ -130,7 +130,7 @@ STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-        '/Users/hlim1/CSC536/Stock-Alarm/stockAlarm/static',
+        '/static',
 )
 
 STATICFILES_FINDERS = (
