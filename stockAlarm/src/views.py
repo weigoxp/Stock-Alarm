@@ -3,9 +3,9 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, user_logged_in
 from django.shortcuts import render, redirect
-
+from .models import Stock
 import json
 
 
@@ -44,8 +44,20 @@ def save_stock_price_change(request):
             decrease_to = form.cleaned_data['decrease_to']
             increase_by = form.cleaned_data['increase_by']
             decrease_by = form.cleaned_data['decrease_by']
-        return render(request, 'main.html', {'form': saveStockPriceChangeForm()})
     # I don't know why the request is never GET...
     else:
-        form = saveStockPriceChangeForm()
-        return render(request, 'main.html', {'form': form})
+        print("there is a GET request")
+
+    if request.user.is_authenticated:
+        context = {
+            'form': saveStockPriceChangeForm(),
+            'stocks': Stock.objects.filter(uid=request.user)
+        }
+        print(context['stocks'])
+    else:
+        context = {
+            'form': saveStockPriceChangeForm(),
+        }
+    # for e in Stock.objects.all():
+    #     print(e.uid)
+    return render(request, 'main.html', context)
