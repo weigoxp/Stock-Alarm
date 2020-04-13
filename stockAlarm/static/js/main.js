@@ -13,7 +13,7 @@ var settings = {
     "method": "GET",
     "headers": {
         "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-        "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+        "x-rapidapi-key": "b8232ea744msh9c8f6f7486e4e2bp11c68bjsn4b526dfea2b8"
     }
 }
 
@@ -127,7 +127,7 @@ var movers = {
     "method": "GET",
     "headers": {
         "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-        "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+        "x-rapidapi-key": "b8232ea744msh9c8f6f7486e4e2bp11c68bjsn4b526dfea2b8"
     }
 }
 
@@ -193,7 +193,7 @@ function searchSymbol() {
         "method": "GET",
         "headers": {
             "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-            "x-rapidapi-key": "d720cffba4mshb373c712d83bb00p1d8f59jsn6e5704ee7048"
+            "x-rapidapi-key": "b8232ea744msh9c8f6f7486e4e2bp11c68bjsn4b526dfea2b8"
         }
     }
     settings["url"] = settings["url"] + symbol.value
@@ -227,25 +227,29 @@ function addToWatchlist() {
     row.setAttribute("id", symCell.innerHTML);
     var prcCell = row.insertCell(2);
     prcCell.innerHTML = document.getElementById('prc').innerHTML; 
+    prcCell.setAttribute("id", "id_prc_"+symCell.innerHTML);
     var mktCell = row.insertCell(3);
     mktCell.innerHTML = document.getElementById('mkt').innerHTML; 
     var rangeCell = row.insertCell(4);
     rangeCell.innerHTML = document.getElementById('52-weeks-range').innerHTML; 
     var mktChgCell = row.insertCell(5);
     mktChgCell.innerHTML = document.getElementById('prc-chg').innerHTML; 
+    mktChgCell.setAttribute("id", "id_chg_"+symCell.innerHTML);
     var openNavBtnCell = row.insertCell(6);
-    // Open notification settings.
+    var element1 = document.createElement("img");
     var element1 = document.createElement("input");
     element1.setAttribute("type", "button");
-    element1.setAttribute("class", "btn btn-info");
-    element1.setAttribute("value", "Add");
-    element1.setAttribute("onclick", "openNav()");
+    element1.setAttribute("class", "btn btn-info ml-4");
+    element1.setAttribute("id", "btn_noti_"+symCell.innerHTML);
+    element1.setAttribute("value", "Setting");
+    element1.setAttribute("onclick", "openNav(this)");
     openNavBtnCell.appendChild(element1);
     // Remove target from the watchlist.
     var element2 = document.createElement("input");
     element2.setAttribute("type", "button");
-    element2.setAttribute("class", "btn btn-danger");
+    element2.setAttribute("class", "btn btn-danger btn-xm");
     element2.setAttribute("value", "Remove");
+    element2.setAttribute("id", "btn_rev_"+symCell.innerHTML);
     element2.setAttribute("onclick", "remove('"+symCell.innerHTML+"');");
     removeOptionCell.appendChild(element2);
 }
@@ -255,10 +259,72 @@ function remove(target) {
     rmvTarget.remove();
 }
 
-function openNav() {
+function openNav(elem) {
     document.getElementById("myNav").style.height = "100%";
+    var btn_elem = document.getElementById("openNav");
+    btn_elem.name = "id_"+elem.id.slice(9);
 }
 
 function closeNav() {
     document.getElementById("myNav").style.height = "0%";
+    // Reset name back to default id - "temp_name".
+    document.getElementById("openNav").name = "temp_name";
 }
+
+function notification(current_elem) {
+    var current_name = current_elem.name.slice(3);
+    var current_price = Number(document.getElementById("id_prc_"+current_name).innerHTML);
+    var current_price_chg = document.getElementById("id_chg_"+current_name).innerHTML;
+    var arr = current_price_chg.split('/');
+    var usd = Number(arr[0]);
+    var perc = Number(arr[1].slice(0,-1));
+
+    var original_price = current_price + usd;
+
+    var increase_price = Number(document.getElementById("id_increase_to").value);
+    if (increase_price && current_price >= increase_price) {
+        push("inc", current_price, current_name, current_price, original_price);
+    }
+    var decrease_price = Number(document.getElementById("id_decrease_to").value);
+    if (decrease_price && current_price <= decrease_price) {
+        push("dec", current_price, current_name, current_price, original_price);
+    }
+    var increase_by = Number(document.getElementById("id_increase_by").value);
+    if (increase_by && perc >= increase_by) {
+        push("inc_%", perc, current_name, current_price, original_price);
+    }
+    var decrease_by = Number(document.getElementById("id_decrease_by").value);
+    if (decrease_by && perc >= decrease_by) {
+        push("dec_%", perc, current_name, current_price, original_price);
+    }
+}
+
+function push(stat, msg, symbol, price, org){
+    formed_msg = "Symbol: " + symbol + "; ";
+    body_msg = "Original Price: " + org.toString() + "\n";
+
+    if (stat == "inc") {
+        formed_msg = formed_msg + "Price increased to " + msg.toString();
+    }
+    else if (stat == "dec") {
+        formed_msg = formed_msg + "Price decreased to " + msg.toString();
+    }
+    else if (stat == "inc_%") {
+        formed_msg = formed_msg + "Price increased by " + msg.toString() + "%";
+        body_msg = body_msg + "; Current Price: " + price.toString() + "\n";
+    }
+    else if (stat == "dec_%") {
+        formed_msg = formed_msg + "Price decreased by " + msg.toString() + "%";
+        body_msg = body_msg + "; Current Price: " + price.toString() + "\n";
+    }
+
+    Push.create(formed_msg.toString(),{
+        body: body_msg,
+        icon: '/Logo_small.png',
+        timeout: 10000,
+        onClick: function () {
+            window.focus();
+            this.close();
+        }
+    });
+};
