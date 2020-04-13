@@ -142,11 +142,13 @@ $.ajax(news).done(function (response) {
     news_div.appendChild(header);
 
     var i;
-    for (i = 0; i < items.length; i++) {
+    for (i = 0; i < 6; i++) {
         var a = document.createElement("a");
         var link = document.createTextNode("<" + items[i]["title"] + ">");
+        var br = document.createElement('br');
         a.appendChild(link);
         a.href = items[i]["link"];
+        a.appendChild(br);
         news_div.appendChild(a);
     }
 });
