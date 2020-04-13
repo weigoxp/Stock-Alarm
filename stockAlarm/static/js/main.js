@@ -120,6 +120,37 @@ $.ajax(settings).done(function (response) {
     });
 });
 
+var news = {
+	"async": true,
+	"crossDomain": true,
+	"url": "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/get-news?region=US&category=%255EDJI",
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+		"x-rapidapi-key": "b8232ea744msh9c8f6f7486e4e2bp11c68bjsn4b526dfea2b8"
+	}
+}
+
+$.ajax(news).done(function (response) {
+    console.log(response)
+    var items = response["items"]["result"]
+    var news_div = document.getElementById("news");
+    var header = document.createElement("h3");
+    var text = document.createTextNode("Latest Market Headlines");
+    header.setAttribute("class", "text-body");
+    header.appendChild(text);
+    news_div.appendChild(header);
+
+    var i;
+    for (i = 0; i < items.length; i++) {
+        var a = document.createElement("a");
+        var link = document.createTextNode("<" + items[i]["title"] + ">");
+        a.appendChild(link);
+        a.href = items[i]["link"];
+        news_div.appendChild(a);
+    }
+});
+
 var movers = {
     "async": true,
     "crossDomain": true,

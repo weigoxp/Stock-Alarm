@@ -118,6 +118,10 @@
                                         <td class='col-sm-3'>
                                             <canvas id="ftse-chart" width="400" height="400"></canvas>
                                         </td>
+                                        <td class='col-sm-9'>
+                                            <div id="news">
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -206,33 +210,33 @@
                                 </tr>
                             </table>
                         </div>
-                    </div>
-                    {% else %}
-                    <div class="border-top pt-3">
-                        <div class="container mt-3 p-0">
-                            You have to<a class="ml-2" href="{% url 'login' %}">Log In</a> to see your watchlist.
+                        {% else %}
+                        <div class="border-top pt-3">
+                            <div class="container mt-3 p-0">
+                                You have to<a class="ml-2" href="{% url 'login' %}">Log In</a> to see your watchlist.
+                            </div>
+                            <div class="container mt-3 p-0">
+                                Need An Account?<a class="ml-2" href="{% url 'register' %}">Sign Up</a> Now.
+                            </div>
                         </div>
-                        <div class="container mt-3 p-0">
-                            Need An Account?<a class="ml-2" href="{% url 'register' %}">Sign Up</a> Now.
+                        {% endif %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Symbol</th>
+                                        <th>Price</th>
+                                        <th>Market</th>
+                                        <th>52 weeks range</th>
+                                        <th>Market Change ($/%)</th>
+                                        <th>Notification Setting</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="watchlist-body">
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    {% endif %}
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Symbol</th>
-                                    <th>Price</th>
-                                    <th>Market</th>
-                                    <th>52 weeks range</th>
-                                    <th>Market Change ($/%)</th>
-                                    <th>Notification Setting</th>
-                                </tr>
-                            </thead>
-                            <tbody id="watchlist-body">
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
